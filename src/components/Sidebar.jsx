@@ -55,15 +55,18 @@ export default function Sidebar({ theme, onToggleTheme, onNavigate }) {
           Journal
           {entries.length > 0 && <span className="count">{entries.length}</span>}
         </NavLink>
-        <NavLink to="/tasks" end className="sidebar-link" onClick={onNavigate}>
-          <Icon name="check" size={17} />
-          Tasks
-          {openTasks > 0 && <span className="count">{openTasks}</span>}
-        </NavLink>
-        <NavLink to="/tasks/history" className="sidebar-link sub" onClick={onNavigate}>
-          <Icon name="clock" size={16} />
-          History
-        </NavLink>
+        {/* History stays tucked away until the Tasks group is hovered or focused. */}
+        <div className="nav-group">
+          <NavLink to="/tasks" end className="sidebar-link" onClick={onNavigate}>
+            <Icon name="check" size={17} />
+            Tasks
+            {openTasks > 0 && <span className="count">{openTasks}</span>}
+          </NavLink>
+          <NavLink to="/tasks/history" className="sidebar-link sub" onClick={onNavigate}>
+            <Icon name="clock" size={16} />
+            History
+          </NavLink>
+        </div>
       </nav>
 
       <div className="sidebar-foot">

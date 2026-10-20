@@ -10,6 +10,7 @@ import useLocalStorage from '../../hooks/useLocalStorage.js';
 import useTodos from '../../hooks/useTodos.js';
 import { CHEERS, pickGif } from '../../lib/gifs.js';
 import { DUE_FILTERS, PRIORITIES, SORTS, dueState, matchesDue, sortTasks } from '../../lib/todos.js';
+import { uid } from '../../lib/id.js';
 
 const TABS = [
   { value: 'all', label: 'All' },
@@ -64,7 +65,7 @@ export default function Tasks() {
   }, [milestone]);
 
   function burst(x, y, big = false) {
-    const id = crypto.randomUUID();
+    const id = uid();
     setBursts((b) => [...b, { id, x, y, big }]);
     setTimeout(() => setBursts((b) => b.filter((p) => p.id !== id)), big ? 1600 : 900);
   }

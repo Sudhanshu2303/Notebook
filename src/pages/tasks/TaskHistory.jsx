@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import Segmented from '../../components/todo/Segmented.jsx';
@@ -25,7 +25,29 @@ const VIEWS = [
 ];
 
 export default function TaskHistory() {
-  const { tasks, events, clearHistory } = useTodos();
+  const { tasks, events, clearHistory, deleteEvent, deleteTaskHistory, restoreEvents } = useTodos();
+  const [undo, setUndo] = useState(null);
+
+  useEffect(() => {
+    if (!undo) return;
+    const timer = setTimeout(() => setUndo(null), 5000);
+    return () => clearTimeout(timer);
+  }, [undo]);
+
+  function removeEvent(event) {
+    const removed = deleteEvent(event.id);
+    if (removed.length) setUndo({ events: removed, text: 'Event removed', key: Date.now() });
+  }
+
+  function removeTaskHistory(record) {
+    const removed = deleteTaskHistory(record.taskId);
+    if (removed.length) setUndo({ events: removed, text: `History for "${record.title}" removed`, key: Date.now() });
+  }
+
+  function undoRemove() {
+    restoreEvents(undo.events);
+    setUndo(null);
+  }
   const [range, setRange] = useLocalStorage('history-range', '30');
   const [view, setView] = useLocalStorage('history-view', 'timeline');
   const [query, setQuery] = useState('');
@@ -119,9 +141,9 @@ export default function TaskHistory() {
       </div>
 
       {view === 'timeline' ? (
-        <Timeline events={visibleEvents} recordById={recordById} />
+        <Timeline events={visibleEvents} recordById={recordById} onRemove={removeEvent} />
       ) : (
-        <RecordTable records={visibleRecords} />
+        <RecordTable records={visibleRecords} onRemove={removeTaskHistory} />
       )}
 
       {events.length > 0 && (
@@ -130,6 +152,13 @@ export default function TaskHistory() {
             Tracking since {formatDate(Math.min(...events.map((e) => e.at)))} · {events.length} events logged
           </span>
           <button type="button" className="link danger" onClick={confirmClear}>Clear history</button>
+        </div>
+      )}
+
+      {undo && (
+        <div className="flash flash-action" role="status" key={undo.key}>
+          <span>{undo.text}</span>
+          <button type="button" onClick={undoRemove}>Undo</button>
         </div>
       )}
     </div>
@@ -147,7 +176,7 @@ function groupByDay(events) {
   return groups;
 }
 
-function Timeline({ events, recordById }) {
+function Timeline({ events, recordById, onRemove }) {
   if (events.length === 0) return <p className="meta center">No activity in this range.</p>;
 
   return (
@@ -174,6 +203,15 @@ function Timeline({ events, recordById }) {
                     </p>
                     <EventDetail event={e} record={record} />
                   </div>
+                  <button
+                    type="button"
+                    className="icon-btn danger row-remove"
+                    onClick={() => onRemove(e)}
+                    aria-label={`Remove "${type.label} ${title}" from history`}
+                    title="Remove from history"
+                  >
+                    <Icon name="x" size={15} />
+                  </button>
                 </li>
               );
             })}
@@ -212,7 +250,7 @@ function DateCell({ ts, empty = '—' }) {
   );
 }
 
-function RecordTable({ records }) {
+function RecordTable({ records, onRemove }) {
   if (records.length === 0) return <p className="meta center">No tasks in this range.</p>;
 
   return (
@@ -225,6 +263,7 @@ function RecordTable({ records }) {
             <th>Completed</th>
             <th>Time taken</th>
             <th>Status</th>
+            <th className="cell-action"><span className="sr-only">Remove</span></th>
           </tr>
         </thead>
         <tbody>
@@ -241,6 +280,17 @@ function RecordTable({ records }) {
                     <span className={`status-pill status-${r.status}`}>{RECORD_STATUS[r.status]}</span>
                     {r.deletedAt && <span className="cell-note muted">on {formatDate(r.deletedAt)}</span>}
                   </span>
+                </td>
+                <td className="cell-action">
+                  <button
+                    type="button"
+                    className="icon-btn danger row-remove"
+                    onClick={() => onRemove(r)}
+                    aria-label={`Remove all history for "${r.title}"`}
+                    title="Remove this task's history"
+                  >
+                    <Icon name="x" size={15} />
+                  </button>
                 </td>
               </tr>
             );

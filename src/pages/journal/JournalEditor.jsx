@@ -7,6 +7,7 @@ import TagInput from '../../components/TagInput.jsx';
 import useJournal from '../../hooks/useJournal.js';
 import useLocalStorage from '../../hooks/useLocalStorage.js';
 import { emptyEntry, toDateKey, wordCount } from '../../lib/journal.js';
+import { uid } from '../../lib/id.js';
 
 const isBlank = (f) => !f.title.trim() && !f.body.trim() && !f.mood && !f.energy && f.tags.length === 0;
 
@@ -70,7 +71,7 @@ function Editor({ id }) {
     const now = Date.now();
     const saved = {
       ...form,
-      id: form.id ?? crypto.randomUUID(),
+      id: form.id ?? uid(),
       title: form.title.trim(),
       body: form.body.trim(),
       createdAt: form.createdAt ?? now,

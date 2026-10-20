@@ -1,4 +1,5 @@
 import { toDateKey } from './journal.js';
+import { uid } from './id.js';
 
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -29,7 +30,7 @@ export function rangeStart(range) {
 }
 
 export function makeEvent(type, task, at = Date.now()) {
-  return { id: crypto.randomUUID(), taskId: task.id, title: task.title, type, at };
+  return { id: uid(), taskId: task.id, title: task.title, type, at };
 }
 
 export function statusChangeType(from, to) {
@@ -49,7 +50,8 @@ export function seedHistory(tasks) {
   return events.sort((a, b) => a.at - b.at);
 }
 
-// One record per task ever seen, including deleted ones, with its key timestamps.
+// One record per task with logged events (including deleted tasks), with its key timestamps.
+// Current tasks only enrich records; a task whose history was removed doesn't reappear.
 export function buildRecords(events, tasks) {
   const records = new Map();
   const recordFor = (taskId, title) => {
@@ -70,7 +72,8 @@ export function buildRecords(events, tasks) {
   }
 
   for (const task of tasks) {
-    const r = recordFor(task.id, task.title);
+    if (!records.has(task.id)) continue;
+    const r = records.get(task.id);
     r.title = task.title;
     r.status = task.status;
     r.createdAt ??= task.createdAt || null;

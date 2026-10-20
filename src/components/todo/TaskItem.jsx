@@ -3,6 +3,7 @@ import Icon from '../Icon.jsx';
 import DuePicker from './DuePicker.jsx';
 import Segmented from './Segmented.jsx';
 import { PRIORITIES, STATUSES, dueState, formatDue, subtaskProgress } from '../../lib/todos.js';
+import { uid } from '../../lib/id.js';
 
 export default function TaskItem({ task, expanded, onToggleExpand, onSetStatus, onUpdate, onDelete }) {
   const done = task.status === 'done';
@@ -83,7 +84,7 @@ function TaskDetails({ task, onUpdate, onSetStatus }) {
   function addSubtask(e) {
     e.preventDefault();
     if (!subText.trim()) return;
-    onUpdate({ subtasks: [...task.subtasks, { id: crypto.randomUUID(), title: subText.trim(), done: false }] });
+    onUpdate({ subtasks: [...task.subtasks, { id: uid(), title: subText.trim(), done: false }] });
     setSubText('');
   }
 

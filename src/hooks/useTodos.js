@@ -45,5 +45,27 @@ export default function useTodos() {
     setHistory([]);
   }
 
-  return { tasks, events, addTask, updateTask, deleteTask, clearCompleted, clearHistory };
+  // Removes logged events (one, or all of a task's) and returns them so they can be restored.
+  function removeEvents(predicate) {
+    const removed = events.filter(predicate);
+    setHistory((prev) => (prev ?? []).filter((e) => !predicate(e)));
+    return removed;
+  }
+
+  const deleteEvent = (eventId) => removeEvents((e) => e.id === eventId);
+  const deleteTaskHistory = (taskId) => removeEvents((e) => e.taskId === taskId);
+  const restoreEvents = (restored) => log(...restored);
+
+  return {
+    tasks,
+    events,
+    addTask,
+    updateTask,
+    deleteTask,
+    clearCompleted,
+    clearHistory,
+    deleteEvent,
+    deleteTaskHistory,
+    restoreEvents,
+  };
 }

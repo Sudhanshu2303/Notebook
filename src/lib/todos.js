@@ -1,4 +1,5 @@
 import { parseDateKey, toDateKey } from './journal.js';
+import { uid } from './id.js';
 
 export const STATUSES = [
   { value: 'todo', label: 'To do' },
@@ -37,7 +38,7 @@ export function dayKeyFromToday(offset) {
 
 export function newTask({ title, priority = 'none', due = null }) {
   return {
-    id: crypto.randomUUID(),
+    id: uid(),
     title: title.trim(),
     notes: '',
     status: 'todo',
