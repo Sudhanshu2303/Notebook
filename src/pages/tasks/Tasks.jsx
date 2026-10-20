@@ -1,14 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
-import Icon from '../components/Icon.jsx';
-import Confetti from '../components/todo/Confetti.jsx';
-import GifCard from '../components/todo/GifCard.jsx';
-import ProgressCard from '../components/todo/ProgressCard.jsx';
-import TaskComposer from '../components/todo/TaskComposer.jsx';
-import TaskItem from '../components/todo/TaskItem.jsx';
-import useLocalStorage from '../hooks/useLocalStorage.js';
-import useTodos from '../hooks/useTodos.js';
-import { CHEERS, pickGif } from '../lib/gifs.js';
-import { DUE_FILTERS, PRIORITIES, SORTS, dueState, matchesDue, sortTasks } from '../lib/todos.js';
+import { useLocation } from 'react-router-dom';
+import Icon from '../../components/Icon.jsx';
+import Confetti from '../../components/todo/Confetti.jsx';
+import GifCard from '../../components/todo/GifCard.jsx';
+import ProgressCard from '../../components/todo/ProgressCard.jsx';
+import TaskComposer from '../../components/todo/TaskComposer.jsx';
+import TaskItem from '../../components/todo/TaskItem.jsx';
+import useLocalStorage from '../../hooks/useLocalStorage.js';
+import useTodos from '../../hooks/useTodos.js';
+import { CHEERS, pickGif } from '../../lib/gifs.js';
+import { DUE_FILTERS, PRIORITIES, SORTS, dueState, matchesDue, sortTasks } from '../../lib/todos.js';
 
 const TABS = [
   { value: 'all', label: 'All' },
@@ -17,7 +18,7 @@ const TABS = [
   { value: 'done', label: 'Done' },
 ];
 
-export default function Todo() {
+export default function Tasks() {
   const { tasks, addTask, updateTask, deleteTask, clearCompleted } = useTodos();
   const [tab, setTab] = useState('all');
   const [dueFilter, setDueFilter] = useState(null);
@@ -32,6 +33,9 @@ export default function Todo() {
   const [milestone, setMilestone] = useState(null);
   const [allDoneGif] = useState(() => pickGif('allDone'));
   const [emptyGif] = useState(() => pickGif('empty'));
+  const location = useLocation();
+  // "New → Task" in the sidebar navigates here with this flag to focus the input.
+  const focusSignal = location.state?.focusComposer ? location.key : null;
 
   const counts = useMemo(() => {
     const c = { todo: 0, doing: 0, done: 0, today: 0, overdue: 0 };
@@ -128,26 +132,7 @@ export default function Todo() {
   );
 
   return (
-    <section className="page">
-      <header className="page-head">
-        <div>
-          <p className="eyebrow">
-            {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
-          </p>
-          <h1 className="page-title">Tasks</h1>
-        </div>
-        <button
-          type="button"
-          className={`btn btn-ghost gif-toggle${gifsOn ? ' on' : ''}`}
-          onClick={() => setGifsOn(!gifsOn)}
-          aria-pressed={gifsOn}
-          title="Celebration GIFs"
-        >
-          <Icon name="image" size={16} />
-          GIFs {gifsOn ? 'on' : 'off'}
-        </button>
-      </header>
-
+    <>
       {total > 0 && <ProgressCard counts={counts} total={total} onQuickFilter={quickFilter} />}
 
       {allDone && (
@@ -161,7 +146,7 @@ export default function Todo() {
         </div>
       )}
 
-      <TaskComposer onAdd={addTask} />
+      <TaskComposer onAdd={addTask} focusSignal={focusSignal} />
 
       {total === 0 ? (
         <div className="empty-state">
@@ -188,6 +173,17 @@ export default function Todo() {
                   </button>
                 ))}
               </div>
+              <div className="task-filters-actions">
+                <button
+                  type="button"
+                  className={`btn btn-ghost btn-sm gif-toggle${gifsOn ? ' on' : ''}`}
+                  onClick={() => setGifsOn(!gifsOn)}
+                  aria-pressed={gifsOn}
+                  title="Celebration GIFs"
+                >
+                  <Icon name="image" size={15} />
+                  GIFs {gifsOn ? 'on' : 'off'}
+                </button>
               <label className="sort">
                 <span>Sort</span>
                 <select value={sort} onChange={(e) => setSort(e.target.value)}>
@@ -196,6 +192,7 @@ export default function Todo() {
                   ))}
                 </select>
               </label>
+              </div>
             </div>
             <div className="task-filters-bottom">
               <label className="search small">
@@ -289,6 +286,6 @@ export default function Todo() {
           <p className="meta">Keep the momentum going.</p>
         </div>
       )}
-    </section>
+    </>
   );
 }

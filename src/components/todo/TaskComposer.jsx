@@ -1,13 +1,18 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Icon from '../Icon.jsx';
 import DuePicker from './DuePicker.jsx';
 import { PRIORITIES, newTask } from '../../lib/todos.js';
 
-export default function TaskComposer({ onAdd }) {
+export default function TaskComposer({ onAdd, focusSignal }) {
   const [title, setTitle] = useState('');
   const [priority, setPriority] = useState('none');
   const [due, setDue] = useState(null);
   const open = title.trim().length > 0;
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (focusSignal) inputRef.current?.focus();
+  }, [focusSignal]);
 
   function submit(e) {
     e.preventDefault();
@@ -22,7 +27,7 @@ export default function TaskComposer({ onAdd }) {
     <form onSubmit={submit} className={`composer card${open ? ' open' : ''}`}>
       <div className="composer-main">
         <Icon name="plus" size={18} />
-        <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Add a task and press Enter" />
+        <input ref={inputRef} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Add a task and press Enter" />
         <button type="submit" className="btn btn-primary" disabled={!open}>Add</button>
       </div>
       {open && (
