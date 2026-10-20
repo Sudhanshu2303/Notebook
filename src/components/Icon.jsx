@@ -7,6 +7,12 @@ const paths = {
   trash: 'M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6',
   flame: 'M12 22c4 0 7-3 7-7 0-3-2-6-4-8 0 3-2 4-3 4 0-4-2-7-5-9 0 5-4 7-4 13 0 4 3 7 9 7Z',
   x: 'M18 6 6 18M6 6l12 12',
+  flag: 'M5 21V4m0 0h11l-2 4 2 4H5',
+  calendar: 'M8 3v3m8-3v3M4 9h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z',
+  note: 'M6 3h9l4 4v14H6zM9 12h7M9 16h5',
+  chevron: 'M9 6l6 6-6 6',
+  image: 'M4 5h16v14H4zM4 16l5-5 4 4 3-3 4 4M15 9h.01',
+  list: 'M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01',
 };
 
 export default function Icon({ name, size = 18 }) {
