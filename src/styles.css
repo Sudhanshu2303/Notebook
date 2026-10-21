@@ -385,7 +385,15 @@ kbd {
   font-size: var(--fs-md);
   letter-spacing: -0.01em;
 }
-.sidebar-brand { padding: var(--s-1) var(--s-2); color: var(--sb-text-strong); }
+.sidebar-brand {
+  padding: var(--s-1) var(--s-2);
+  border: none;
+  border-radius: var(--r-md);
+  background: none;
+  color: var(--sb-text-strong);
+  text-align: left;
+  pointer-events: none; /* only interactive in the mobile drawer */
+}
 .logo {
   display: grid;
   place-items: center;
@@ -732,7 +740,13 @@ kbd {
 .energy-bar:nth-child(4) { height: 85%; }
 .energy-bar:nth-child(5) { height: 100%; }
 .energy-bar:hover { background: var(--border-strong); }
-.energy-bar.filled { background: var(--accent); }
+.energy-bar.filled { background: var(--energy, var(--accent)); }
+/* Bars take the colour of the chosen level: red when drained through yellow to green when energized. */
+.energy-1 { --energy: var(--mood-1); }
+.energy-2 { --energy: var(--mood-2); }
+.energy-3 { --energy: var(--mood-3); }
+.energy-4 { --energy: var(--mood-4); }
+.energy-5 { --energy: var(--mood-5); }
 .energy-label { color: var(--text-2); font-size: var(--fs-sm); }
 
 .tag-field { position: relative; }
@@ -1220,6 +1234,104 @@ kbd {
 }
 
 /* =========================================================
+   Onboarding: welcome tour, install tip
+   ========================================================= */
+.welcome-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  padding: var(--s-4);
+  overflow-y: auto;
+  background: rgb(0 0 0 / 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.welcome {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-3);
+  width: min(460px, 100%);
+  padding: var(--s-8) var(--s-6) var(--s-5);
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+  animation: pop 0.2s ease;
+}
+.welcome-close { position: absolute; top: var(--s-2); right: var(--s-2); }
+.welcome-logo {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--r-lg);
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+.welcome-title { font-size: var(--fs-xl); font-weight: 700; letter-spacing: -0.01em; }
+.welcome-text { color: var(--text-2); max-width: 36ch; }
+
+.welcome-features { display: flex; flex-direction: column; gap: var(--s-2); width: 100%; margin-top: var(--s-2); text-align: left; }
+.welcome-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-3);
+  padding: var(--s-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--bg-subtle);
+}
+.welcome-feature > svg { flex-shrink: 0; margin-top: 2px; color: var(--accent); }
+.welcome-theme { margin-top: var(--s-2); }
+
+.welcome-choices { display: flex; flex-direction: column; gap: var(--s-2); width: 100%; margin-top: var(--s-2); }
+.welcome-choice {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  width: 100%;
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  font-weight: 500;
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s;
+}
+.welcome-choice > svg { color: var(--accent); }
+.welcome-choice:hover { background: var(--accent-soft); border-color: var(--accent); }
+
+.welcome-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 40px;
+  margin-top: var(--s-4);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--border);
+}
+.welcome-dots { display: flex; gap: 6px; }
+.welcome-dots span { width: 7px; height: 7px; border-radius: 50%; background: var(--border-strong); transition: background 0.2s, width 0.2s; }
+.welcome-dots span.active { width: 18px; border-radius: var(--r-full); background: var(--accent); }
+.welcome-actions { display: flex; gap: var(--s-2); }
+
+.install-tip { display: flex; align-items: flex-start; gap: var(--s-3); padding: var(--s-4); margin-bottom: var(--s-4); }
+.install-tip > div { flex: 1; min-width: 0; }
+.install-tip-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-md);
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
+/* =========================================================
    Responsive
    ========================================================= */
 
@@ -1260,6 +1372,8 @@ kbd {
     transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .drawer-open .sidebar { transform: none; box-shadow: var(--shadow-lg); }
+  .sidebar-brand { pointer-events: auto; cursor: pointer; }
+  .sidebar-brand:active { background: var(--sb-hover); }
   .drawer-backdrop {
     display: block;
     position: fixed;

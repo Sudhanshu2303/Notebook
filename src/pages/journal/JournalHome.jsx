@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
+import InstallTip from '../../components/InstallTip.jsx';
 import MoodStrip from '../../components/MoodStrip.jsx';
 import useJournal from '../../hooks/useJournal.js';
 import {
@@ -40,6 +41,8 @@ export default function JournalHome() {
             <h1 className="display">{greeting(today)}</h1>
           </div>
         </header>
+
+        <InstallTip />
 
         {!wroteToday && (
           <div className="card checkin">

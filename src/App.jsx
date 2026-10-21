@@ -3,6 +3,8 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import Flash from './components/Flash.jsx';
 import Icon from './components/Icon.jsx';
 import Sidebar from './components/Sidebar.jsx';
+import Welcome from './components/Welcome.jsx';
+import useOnboarding from './hooks/useOnboarding.js';
 import useTheme from './hooks/useTheme.js';
 import JournalEditor from './pages/journal/JournalEditor.jsx';
 import JournalHome from './pages/journal/JournalHome.jsx';
@@ -14,10 +16,16 @@ import TasksLayout from './pages/tasks/TasksLayout.jsx';
 export default function App() {
   const [theme, toggleTheme] = useTheme();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { showWelcome, finish, replay } = useOnboarding();
 
   return (
     <div className={`shell${drawerOpen ? ' drawer-open' : ''}`}>
-      <Sidebar theme={theme} onToggleTheme={toggleTheme} onNavigate={() => setDrawerOpen(false)} />
+      <Sidebar
+        theme={theme}
+        onToggleTheme={toggleTheme}
+        onReplayWelcome={replay}
+        onNavigate={() => setDrawerOpen(false)}
+      />
       <div className="drawer-backdrop" onClick={() => setDrawerOpen(false)} aria-hidden="true" />
 
       <div className="main">
@@ -58,6 +66,7 @@ export default function App() {
       </div>
 
       <Flash />
+      {showWelcome && <Welcome theme={theme} onToggleTheme={toggleTheme} onClose={finish} />}
     </div>
   );
 }

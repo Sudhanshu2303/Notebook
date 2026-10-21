@@ -2,7 +2,7 @@ import { ENERGY_LEVELS } from '../lib/journal.js';
 
 export default function EnergyPicker({ value, onChange }) {
   return (
-    <div className="energy-picker">
+    <div className={`energy-picker${value ? ` energy-${value}` : ''}`}>
       <div className="energy-bars" role="radiogroup" aria-label="Energy">
         {ENERGY_LEVELS.map((label, i) => {
           const level = i + 1;

@@ -4,7 +4,7 @@ import Icon from './Icon.jsx';
 import useJournal from '../hooks/useJournal.js';
 import useTodos from '../hooks/useTodos.js';
 
-export default function Sidebar({ theme, onToggleTheme, onNavigate }) {
+export default function Sidebar({ theme, onToggleTheme, onReplayWelcome, onNavigate }) {
   const navigate = useNavigate();
   const { entries } = useJournal();
   const { tasks } = useTodos();
@@ -19,12 +19,13 @@ export default function Sidebar({ theme, onToggleTheme, onNavigate }) {
 
   return (
     <aside className="sidebar">
-      <div className="sidebar-brand">
+      {/* On phones the sidebar is a drawer; tapping the brand closes it. */}
+      <button type="button" className="sidebar-brand" onClick={onNavigate} aria-label="Close menu">
         <span className="logo" aria-hidden="true">
           <Icon name="book" size={15} />
         </span>
         Notebook
-      </div>
+      </button>
 
       <div
         className="new-menu"
@@ -73,6 +74,17 @@ export default function Sidebar({ theme, onToggleTheme, onNavigate }) {
         <button type="button" className="sidebar-link theme-toggle" onClick={onToggleTheme}>
           <Icon name={theme === 'dark' ? 'sun' : 'moon'} size={17} />
           {theme === 'dark' ? 'Light mode' : 'Dark mode'}
+        </button>
+        <button
+          type="button"
+          className="sidebar-link"
+          onClick={() => {
+            onNavigate();
+            onReplayWelcome();
+          }}
+        >
+          <Icon name="play" size={17} />
+          Welcome tour
         </button>
       </div>
     </aside>
