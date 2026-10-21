@@ -91,3 +91,34 @@ There is no test, lint or format setup.
 
 - `package.json` is named `Notebook`. npm package names must be lowercase, which only matters if the package is ever published.
 - There is no README.
+
+## Project history and intent
+
+How the app came to be, so future changes fit the original goals. Where this conflicts with the sections above, the sections above are current.
+
+### Original requests (in order)
+1. **Scaffold** (`58bae13`): "a journal and todo list web app" with a clean, minimal design and navigation between a Journal section and a Todo section. Built with React and Vite, saving to localStorage. The existing `package.json` (which included `@anthropic-ai/sdk`) was kept and extended.
+2. **Richer journal** (also in `58bae13`): "log entries, track a mood, and other related info". This added mood (5 levels), energy (5 levels), tags, a date that can be backdated, autosaved drafts, search and filters, a streak, and the 14-day mood strip.
+3. **Richer todo list** (`4599376`): filters, status and progress bars, a distinct look for completed tasks, and "cool gifs to attract the users retention". This added status, priority, due dates, subtasks with their own progress, notes, Smart sort, the progress card, confetti and GIPHY GIFs.
+4. **Redesign** (`8130a15`): "a similar look and feel to Evernote", a light/dark toggle, a more modern look, better typography and spacing, fully responsive, plus **task history** with the date and time each task was created and finished. This gave the app its current shell (sidebar, two-pane journal, Tasks | History tabs).
+
+### Design decisions and why
+- **Evernote-inspired, not a copy:** the layout and feel follow Evernote (sidebar, "+ New" button, note list beside the editor, labelled field rows in the editor), but none of Evernote's branding, logo or name is used. Keep it that way.
+- **Celebration GIFs are for motivation, not decoration:** they appear only at moments that mean something. That's the halfway milestone (with 4 or more tasks), clearing the whole list, and the empty state. Every single completion gets confetti plus a short cheer message instead. Users can switch GIFs off (`todo-gifs`). Don't add GIFs to everyday screens.
+- **GIF choices were checked by eye:** every GIPHY id in `gifs.js` was opened to confirm it shows what its `alt` text says. Do the same before adding new ones; never guess at GIPHY ids. They use the `200.webp` version to keep them light. Some feature copyrighted characters, which is fine for personal use but worth revisiting before a public launch.
+- **Completed tasks must look clearly different** from active ones: a collapsible Completed section, faded, dashed border, filled check, strikethrough, and the completion date.
+- **Smart sort order:** in progress first, then by urgency (overdue → due today → due within 7 days), then by priority, then by due date. A high-priority task with no due date should not sink below a low-priority task due far in the future.
+- **History is an event log, not a snapshot:** it records events as they happen, so a task deleted from the list keeps its row in History. When history tracking first ran, it backfilled events from each task's own `createdAt` / `completedAt`. Tasks deleted before then can't be recovered.
+- **Old data keeps working:** each data format change so far came with a migration through `normalizeTask` / `normalizeEntry`, e.g. old `{ id, text, createdAt }` entries and `{ id, title, done }` tasks.
+
+### Lessons from building it
+- **Class-name collisions:** History's `.status-todo/.status-doing/.status-done` pill styles once also matched task rows, which share those class names, and tinted them. Scope styles for shared state names (e.g. `.status-pill.status-done`).
+- **Panes must share state:** the two-pane journal needs every component to see the same data, which is why `useLocalStorage` is a shared store. An earlier per-component version made the entry list go out of date after saving in the editor.
+- **Save before navigating:** saving then navigating away in the same click used to lose the write. Storage writes now happen synchronously; keep it that way.
+- **Use local dates:** a date picker's `max` once used `toISOString()` (UTC) and was off by a day. Always use `toDateKey`.
+- **Check the UI visually:** UI changes were checked by taking headless Chrome screenshots with sample data, at desktop (1440px) and phone (390px) widths, in both themes. This is how the bugs above were caught. Keep doing it for visual changes.
+
+### How the user likes to work
+- Commit only when asked; the user says "commit this" after reviewing. Commit messages are a short summary line plus bullet points.
+- After each change, report what changed, the localhost URL to check it at, and any known limitations.
+- When asked for the app's address, give `http://localhost:5173` plus links to the main routes.
