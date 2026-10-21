@@ -3,14 +3,28 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#27e5e2" />
     <title>Notebook</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2314a44d'/%3E%3Cpath d='M10 23V10a2 2 0 0 1 2-2h10v13H12a2 2 0 0 0-2 2Zm0 0a2 2 0 0 0 2 2h10v-2' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2327e5e2'/%3E%3Cpath d='M10 23V10a2 2 0 0 1 2-2h10v13H12a2 2 0 0 0-2 2Zm0 0a2 2 0 0 0 2 2h10v-2' fill='none' stroke='%2300262b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
     <script>
-      // Apply the saved (or system) theme before first paint to avoid a flash.
+      // Apply the theme before first paint to avoid a flash (same rule as src/hooks/useTheme.js).
       try {
         var saved = localStorage.getItem('theme');
-        var theme = saved ? JSON.parse(saved) : matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        var pref = saved ? JSON.parse(saved) : 'system';
+        var theme = pref === 'light' || pref === 'dark' ? pref : matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         document.documentElement.dataset.theme = theme;
+
+        // Mood colours: today's latest entry with a mood (same rule as todayMood in src/hooks/useMoodTheme.js).
+        if (JSON.parse(localStorage.getItem('mood-colors') || 'true')) {
+          var d = new Date();
+          var today = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+          var latest = null;
+          JSON.parse(localStorage.getItem('journal-entries') || '[]').forEach(function (e) {
+            var updated = e.updatedAt || e.createdAt || 0;
+            if (e.date === today && e.mood && (!latest || updated > latest.updated)) latest = { mood: e.mood, updated: updated };
+          });
+          if (latest) document.documentElement.dataset.mood = latest.mood;
+        }
       } catch (e) {}
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />

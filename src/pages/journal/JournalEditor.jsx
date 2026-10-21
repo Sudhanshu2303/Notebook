@@ -6,6 +6,7 @@ import MoodPicker from '../../components/MoodPicker.jsx';
 import TagInput from '../../components/TagInput.jsx';
 import useJournal from '../../hooks/useJournal.js';
 import useLocalStorage from '../../hooks/useLocalStorage.js';
+import { setMoodPreview } from '../../hooks/useMoodTheme.js';
 import { emptyEntry, toDateKey, wordCount } from '../../lib/journal.js';
 import { uid } from '../../lib/id.js';
 
@@ -48,6 +49,13 @@ function Editor({ id }) {
     el.style.height = 'auto';
     el.style.height = `${el.scrollHeight}px`;
   }, [form?.body]);
+
+  // Picking a mood for today recolours the app right away; leaving the editor reverts to the saved mood.
+  const previewMood = form?.date === toDateKey(new Date()) ? form.mood : null;
+  useEffect(() => {
+    setMoodPreview(previewMood);
+  }, [previewMood]);
+  useEffect(() => () => setMoodPreview(null), []);
 
   if (!form) {
     return (

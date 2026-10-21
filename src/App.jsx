@@ -5,6 +5,7 @@ import Icon from './components/Icon.jsx';
 import Sidebar from './components/Sidebar.jsx';
 import Welcome from './components/Welcome.jsx';
 import useOnboarding from './hooks/useOnboarding.js';
+import useMoodTheme from './hooks/useMoodTheme.js';
 import useTheme from './hooks/useTheme.js';
 import JournalEditor from './pages/journal/JournalEditor.jsx';
 import JournalHome from './pages/journal/JournalHome.jsx';
@@ -14,15 +15,18 @@ import Tasks from './pages/tasks/Tasks.jsx';
 import TasksLayout from './pages/tasks/TasksLayout.jsx';
 
 export default function App() {
-  const [theme, toggleTheme] = useTheme();
+  const { theme, preference, setPreference, toggle: toggleTheme } = useTheme();
+  const [moodColors, setMoodColors] = useMoodTheme(theme);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { showWelcome, finish, replay } = useOnboarding();
 
   return (
     <div className={`shell${drawerOpen ? ' drawer-open' : ''}`}>
       <Sidebar
-        theme={theme}
-        onToggleTheme={toggleTheme}
+        themePreference={preference}
+        onSetThemePreference={setPreference}
+        moodColors={moodColors}
+        onSetMoodColors={setMoodColors}
         onReplayWelcome={replay}
         onNavigate={() => setDrawerOpen(false)}
       />

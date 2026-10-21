@@ -1,15 +1,34 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import useLocalStorage from './useLocalStorage.js';
 
-const systemTheme = () => (window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+const darkQuery = () => window.matchMedia?.('(prefers-color-scheme: dark)');
+const systemTheme = () => (darkQuery()?.matches ? 'dark' : 'light');
 
-// Follows the system theme until the user picks one; index.html applies it before first paint.
+// The stored preference is 'system' (follow the device, live), 'light' or 'dark'.
+// index.html applies the same rule before first paint.
 export default function useTheme() {
-  const [theme, setTheme] = useLocalStorage('theme', systemTheme());
+  const [preference, setPreference] = useLocalStorage('theme', 'system');
+  const [system, setSystem] = useState(systemTheme);
+
+  useEffect(() => {
+    const query = darkQuery();
+    if (!query) return;
+    const onChange = () => setSystem(systemTheme());
+    query.addEventListener('change', onChange);
+    return () => query.removeEventListener('change', onChange);
+  }, []);
+
+  const theme = preference === 'light' || preference === 'dark' ? preference : system;
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
   }, [theme]);
 
-  return [theme, () => setTheme(theme === 'dark' ? 'light' : 'dark')];
+  // Flips light/dark; landing back on the device's theme goes back to following it.
+  function toggle() {
+    const next = theme === 'dark' ? 'light' : 'dark';
+    setPreference(next === system ? 'system' : next);
+  }
+
+  return { theme, preference, setPreference, toggle };
 }

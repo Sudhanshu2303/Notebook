@@ -4,11 +4,25 @@ import Icon from './Icon.jsx';
 import useJournal from '../hooks/useJournal.js';
 import useTodos from '../hooks/useTodos.js';
 
-export default function Sidebar({ theme, onToggleTheme, onReplayWelcome, onNavigate }) {
+const THEME_OPTIONS = [
+  { value: 'light', label: 'Light', icon: 'sun' },
+  { value: 'dark', label: 'Dark', icon: 'moon' },
+  { value: 'system', label: 'Auto', icon: 'monitor' },
+];
+
+export default function Sidebar({
+  themePreference,
+  onSetThemePreference,
+  moodColors,
+  onSetMoodColors,
+  onReplayWelcome,
+  onNavigate,
+}) {
   const navigate = useNavigate();
   const { entries } = useJournal();
   const { tasks } = useTodos();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const openTasks = tasks.filter((t) => t.status !== 'done').length;
 
   function go(path, state) {
@@ -56,35 +70,74 @@ export default function Sidebar({ theme, onToggleTheme, onReplayWelcome, onNavig
           Journal
           {entries.length > 0 && <span className="count">{entries.length}</span>}
         </NavLink>
-        {/* History stays tucked away until the Tasks group is hovered or focused. */}
-        <div className="nav-group">
-          <NavLink to="/tasks" end className="sidebar-link" onClick={onNavigate}>
-            <Icon name="check" size={17} />
-            Tasks
-            {openTasks > 0 && <span className="count">{openTasks}</span>}
-          </NavLink>
-          <NavLink to="/tasks/history" className="sidebar-link sub" onClick={onNavigate}>
-            <Icon name="clock" size={16} />
-            History
-          </NavLink>
-        </div>
+        {/* History is a tab inside Tasks, so Tasks stays highlighted there too. */}
+        <NavLink to="/tasks" className="sidebar-link" onClick={onNavigate}>
+          <Icon name="check" size={17} />
+          Tasks
+          {openTasks > 0 && <span className="count">{openTasks}</span>}
+        </NavLink>
       </nav>
 
-      <div className="sidebar-foot">
-        <button type="button" className="sidebar-link theme-toggle" onClick={onToggleTheme}>
-          <Icon name={theme === 'dark' ? 'sun' : 'moon'} size={17} />
-          {theme === 'dark' ? 'Light mode' : 'Dark mode'}
-        </button>
+      <div
+        className="sidebar-foot settings"
+        onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setSettingsOpen(false)}
+        onKeyDown={(e) => e.key === 'Escape' && setSettingsOpen(false)}
+      >
+        {settingsOpen && (
+          <div className="settings-panel" role="dialog" aria-label="Settings">
+            <p className="settings-label">Appearance</p>
+            <div className="theme-switch" role="radiogroup" aria-label="Theme">
+              {THEME_OPTIONS.map((o) => (
+                <button
+                  key={o.value}
+                  type="button"
+                  role="radio"
+                  aria-checked={themePreference === o.value}
+                  title={o.value === 'system' ? 'Match your device' : `${o.label} mode`}
+                  onClick={() => onSetThemePreference(o.value)}
+                >
+                  <Icon name={o.icon} size={15} />
+                  {o.label}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={moodColors}
+              className="sidebar-link mood-colors-toggle"
+              onClick={() => onSetMoodColors(!moodColors)}
+              title="Tint the app with the colour of today's mood"
+            >
+              <Icon name="smile" size={17} />
+              Mood colours
+              <span className="switch" aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              className="sidebar-link"
+              onClick={() => {
+                setSettingsOpen(false);
+                onNavigate();
+                onReplayWelcome();
+              }}
+            >
+              <Icon name="play" size={17} />
+              Welcome tour
+            </button>
+          </div>
+        )}
         <button
           type="button"
-          className="sidebar-link"
-          onClick={() => {
-            onNavigate();
-            onReplayWelcome();
-          }}
+          className={`sidebar-link settings-btn${settingsOpen ? ' open' : ''}`}
+          onClick={() => setSettingsOpen(!settingsOpen)}
+          aria-expanded={settingsOpen}
         >
-          <Icon name="play" size={17} />
-          Welcome tour
+          <Icon name="sliders" size={17} />
+          Settings
+          <span className="settings-chevron" aria-hidden="true">
+            <Icon name="chevron" size={14} />
+          </span>
         </button>
       </div>
     </aside>
