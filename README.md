@@ -56,7 +56,7 @@ Notebook is a personal journal and task manager in one responsive web app. It pa
 ## Deployment
 
 - **Vercel project:** `notebook-a-productivity-tracker-application`
-- **Production URL:** [notebook-a-productivity-tra-sudhanshu-ranjans-projects-be3114a4.vercel.app](https://notebook-a-productivity-tra-sudhanshu-ranjans-projects-be3114a4.vercel.app)
+- **Production URL:** [notebook-sr.vercel.app](https://notebook-sr.vercel.app)
 - The production deployment currently uses the Vercel team's SSO protection, so visitors must be signed in to access it.
 - The current deployment was uploaded directly to Vercel. Automatic deployments from GitHub pushes are not connected yet; install the Vercel GitHub integration and connect this repository to enable them.
 
