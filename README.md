@@ -53,6 +53,13 @@ Notebook is a personal journal and task manager in one responsive web app. It pa
 
 `/` redirects to `/journal`; `/todo` redirects to `/tasks`. Unknown paths also return to the journal. The Vercel rewrite in `vercel.json` serves the app shell for these client-side routes on refresh.
 
+## Deployment
+
+- **Vercel project:** `notebook-a-productivity-tracker-application`
+- **Production URL:** [notebook-a-productivity-tra-sudhanshu-ranjans-projects-be3114a4.vercel.app](https://notebook-a-productivity-tra-sudhanshu-ranjans-projects-be3114a4.vercel.app)
+- The production deployment currently uses the Vercel team's SSO protection, so visitors must be signed in to access it.
+- The current deployment was uploaded directly to Vercel. Automatic deployments from GitHub pushes are not connected yet; install the Vercel GitHub integration and connect this repository to enable them.
+
 ## Data and privacy
 
 - Notebook has no backend, account system, or database. Journal entries, drafts, tasks, task history, and preferences are stored in the browser's `localStorage`.
